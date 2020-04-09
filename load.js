@@ -114,4 +114,6 @@ function go(url) {
     window.location.replace(url);
 }
 
-            
+ window.onload = function () {
+    load(0);
+};           
