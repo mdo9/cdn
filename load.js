@@ -1,6 +1,6 @@
 const default_url = 'https://git.io/g';
 const try_again = 3;
-let urls = ['raw.githubusercontent.com', 'raw.githack.com', ''];
+let urls = ['cdn.jsdelivr.net', ''];
 let msg = '';
 
 function get(name) {
@@ -20,7 +20,9 @@ function get_latest_url(url) {
         console.log(urls);
         if (urls.length === 5) {
             urls[0] = url;
-            urls[3] = 'master';
+            urls[2] = urls[1];
+            urls[1] = 'gh';
+            urls[3] = 'cdn';
             urls[4] = 'latest.json';
             let latest = "https://";
             for (let i = 0; i < urls.length; i++) {
@@ -111,9 +113,14 @@ function check(j, u) {
 }
 
 function go(url) {
+    let u = url.split('/');
+    let address = url;
+    if (u.length > 3)
+        address = u[2];
+    show_message('正在等待 ‘ + address + ’ 响应……<br>');
     window.location.replace(url);
 }
 
- window.onload = function () {
+window.onload = function () {
     load(0);
-};           
+};
