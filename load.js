@@ -1,6 +1,7 @@
-const default_url = 'https://git.io/g';
-const try_again = 3;
-let urls = ['cdn.jsdelivr.net', ''];
+const DEFAULT_URL = 'https://git.io/g';
+const TRY_AGAIN = 3;
+const HOSTNAME_ARRAY = ['cdn.jsdelivr.net', ''];
+const LATEST_FILENAME = 'latest.json';
 let msg = '';
 
 function get(name) {
@@ -14,39 +15,40 @@ function get(name) {
     return "";
 }
 
-function get_latest_url(url) {
-    if (url.length > 0) {
-        let urls = window.location.href.split('?')[0].replace("https://", "").split('/');
-        console.log(urls);
-        if (urls.length === 5) {
-            urls[0] = url;
-            urls[2] = urls[1];
-            urls[1] = 'gh';
-            urls[3] = 'cdn';
-            urls[4] = 'latest.json';
-            let latest = "https://";
-            for (let i = 0; i < urls.length; i++) {
-                latest += urls[i];
-                if (i < 4) {
-                    latest += "/"
+function getLatestUrl(hostname) {
+    if (hostname.length > 0) {
+        let myURL = new URL(window.location.href);
+        let pathname = myURL.pathname.split('/');
+        if (pathname.length === 4) {
+            myURL.hostname = hostname;
+            pathname[1] = pathname[0];
+            pathname[0] = 'gh';
+            pathname[2] = 'cdn';
+            pathname[3] = LATEST_FILENAME;
+            let newPathname = '';
+            for (let i = 0; i < pathname.length; i++) {
+                newPathname += pathname[i];
+                if (i < 3) {
+                    newPathname += "/"
                 }
             }
-            return latest
+            myURL.pathname = newPathname;
+            return myURL.href
         }
     }
-    return 'latest.json';
+    return LATEST_FILENAME;
 }
 
 
-function show_message(m) {
+function showMessage(m) {
     msg += m;
     document.getElementById("msg").innerHTML = msg;
 }
 
 function load(i) {
-    let latest_url = get_latest_url(urls[i]);
+    let latestUrl = getLatestUrl(HOSTNAME_ARRAY[i]);
     let request = new XMLHttpRequest();
-    request.open('get', latest_url);
+    request.open('get', latestUrl);
     request.send(null);
     request.onload = function () {
         if (request.status === 200) {
@@ -64,61 +66,63 @@ function load(i) {
             }
             check(0, u);
         } else {
-            console.log('read ' + latest_url + ' fail, request.status' + request.status);
-            show_message('获取信息错误： ' + i + '返回状态码 ' + request.status + '<br>');
-            if (i < urls.length) {
+            console.log('read ' + latestUrl + ' fail, request.status' + request.status);
+            showMessage('获取信息错误： ' + i + '，返回状态码 ' + request.status + '<br>');
+            if (i < HOSTNAME_ARRAY.length) {
                 load(++i);
             } else {
-                go(default_url);
+                go(DEFAULT_URL);
             }
         }
     };
     request.onerror = function () { // only triggers if the request couldn't be made at all
-        console.log('onerror: ' + latest_url);
-        show_message('获取信息错误： ' + i + '<br>');
-        if (i < urls.length) {
+        console.log('onerror: ' + latestUrl);
+        showMessage('获取信息错误： ' + i + '<br>');
+        if (i < HOSTNAME_ARRAY.length) {
             load(++i);
         } else {
-            go(default_url);
+            go(DEFAULT_URL);
         }
     };
 }
 
 function check(j, u) {
-    let request2 = new XMLHttpRequest();
-    request2.open('get', u);
-    request2.send(null);
-    request2.onload = function () {
-        if (request2.status === 200) {
+    let request = new XMLHttpRequest();
+    request.open('get', u);
+    request.send(null);
+    request.onload = function () {
+        if (request.status === 200) {
             go(u);
         } else {
             console.log('fail: ' + request.status);
-            show_message('测试' + j + ": 返回状态码 " + request.status + '<br>');
-            if (j < try_again) {
+            showMessage('测试' + j + ": 返回状态码 " + request.status + '<br>');
+            if (j < TRY_AGAIN) {
                 check(++j, u);
             } else {
-                go(default_url);
+                go(DEFAULT_URL);
             }
         }
     };
-    request2.onerror = function () {
+    request.onerror = function () {
         console.log('onerror:  ' + j + ' fail');
-        show_message('测试' + j + ': 连接错误<br>');
-        if (j < try_again) {
+        showMessage('测试' + j + ': 连接错误<br>');
+        if (j < TRY_AGAIN) {
             check(++j, u);
         } else {
-            go(default_url);
+            go(DEFAULT_URL);
         }
     };
 }
 
 function go(url) {
-    let u = url.split('/');
-    let address = url;
-    if (u.length > 3)
-        address = u[2];
-    show_message('正在等待 ‘ + address + ’ 响应……<br>');
-    window.location.replace(url);
+    let myURL = new URL(url);
+    showMessage('正在等待 ' + myURL.hostname + ' 响应……<br>');
+
+    function jump() {
+        window.location.href = url;
+    }
+
+    setTimeout(jump, 2000);
 }
 
 window.onload = function () {
