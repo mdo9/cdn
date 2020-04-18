@@ -47,6 +47,7 @@ function showMessage(m) {
 
 function load(i) {
     let latestUrl = getLatestUrl(HOSTNAME_ARRAY[i]);
+    console.log(latestUrl);
     let request = new XMLHttpRequest();
     request.open('get', latestUrl);
     request.send(null);
