@@ -19,20 +19,21 @@ function getLatestUrl(hostname) {
     if (hostname.length > 0) {
         let myURL = new URL(window.location.href);
         let pathname = myURL.pathname.split('/');
-        if (pathname.length === 4) {
+        if (pathname.length === 5) {
             myURL.hostname = hostname;
-            pathname[1] = pathname[0];
-            pathname[0] = 'gh';
-            pathname[2] = 'cdn';
-            pathname[3] = LATEST_FILENAME;
+            pathname[2] = pathname[1];
+            pathname[1] = 'gh';
+            pathname[3] = 'cdn';
+            pathname[4] = LATEST_FILENAME;
             let newPathname = '';
-            for (let i = 0; i < pathname.length; i++) {
+            for (let i = 1; i < pathname.length; i++) {
                 newPathname += pathname[i];
-                if (i < 3) {
+                if (i < 4) {
                     newPathname += "/"
                 }
             }
             myURL.pathname = newPathname;
+            console.log(myURL.href);
             return myURL.href
         }
     }
