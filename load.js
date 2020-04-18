@@ -33,7 +33,6 @@ function getLatestUrl(hostname) {
                 }
             }
             myURL.pathname = newPathname;
-            console.log(myURL.href);
             return myURL.href
         }
     }
