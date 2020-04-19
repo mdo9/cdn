@@ -23,7 +23,7 @@ function getLatestUrl(hostname) {
             myURL.hostname = hostname;
             pathname[2] = pathname[1];
             pathname[1] = 'gh';
-            pathname[3] = 'cdn';
+            pathname[3] = 'cdn@1';
             pathname[4] = LATEST_FILENAME;
             let newPathname = '';
             for (let i = 1; i < pathname.length; i++) {
